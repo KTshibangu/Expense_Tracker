@@ -1,0 +1,29 @@
+# Build output
+bin/
+obj/
+
+# IDE files
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# SQLite database files
+*.db
+*.db-shm
+*.db-wal
+
+# Environment / secrets
+.env
+.env.*
+
+# User secrets
+secrets.json
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

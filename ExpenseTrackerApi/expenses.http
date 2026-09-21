@@ -1,0 +1,41 @@
+//GET /expenses
+GET http://localhost:5127/expenses
+
+###
+
+//GET /expenses/1
+GET http://localhost:5127/expenses/3
+
+###
+
+//POST /expenses
+POST http://localhost:5127/expenses
+Content-Type: application/json
+
+{
+    "name": "Fish Market Groceries",
+    "categoryId": 3,
+    "amount": 400,
+    "paymentDate": "2026-06-03"
+}
+
+###
+// PUT /expenses/1
+PUT http://localhost:5127/expenses/2
+Content-Type: application/json
+
+{
+    "name": "Chester Groceries",
+    "categoryId": 3,
+    "amount": 900,
+    "paymentDate": "2026-06-03"
+}
+
+###
+
+//DELETE /expenses/1
+DELETE http://localhost:5127/expenses/3
+
+###
+//GET /categories
+GET http://localhost:5127/categories
