@@ -13,9 +13,40 @@ public static class ExpensesEndpoints
     {
         var group = app.MapGroup("/expenses");
         //GET /expenses
-        group.MapGet("/", async (ExpenseContext dbContext) => 
-            await dbContext.Expenses
+        // group.MapGet("/", async (ExpenseContext dbContext) => 
+        //     await dbContext.Expenses
+        //     .Include(expense => expense.Category)
+        //     .Select(expense => new ExpenseSummaryDto(
+        //         expense.Id,
+        //         expense.Name,
+        //         expense.Category!.Name,
+        //         expense.Amount,
+        //         expense.PaymentDate
+        //     ))
+        //     .AsNoTracking()
+        //     .ToListAsync()
+        // );
+
+        group.MapGet("/", async (
+            ExpenseContext dbContext,
+            int? month,
+            int? categoryId) =>
+        {
+        var query = dbContext.Expenses
             .Include(expense => expense.Category)
+            .AsQueryable();
+
+        if (month.HasValue)
+        {
+            query = query.Where(expense => expense.PaymentDate.Month == month.Value);
+        }
+
+        if (categoryId.HasValue)
+        {
+        query = query.Where(expense => expense.CategoryId == categoryId.Value);
+        }
+
+        return await query
             .Select(expense => new ExpenseSummaryDto(
                 expense.Id,
                 expense.Name,
@@ -24,8 +55,8 @@ public static class ExpensesEndpoints
                 expense.PaymentDate
             ))
             .AsNoTracking()
-            .ToListAsync()
-        );
+            .ToListAsync();
+        });
 
         //GET /expenses/1
         group.MapGet("/{id}", async (int id, ExpenseContext dbContext) =>

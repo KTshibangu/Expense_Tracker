@@ -1,0 +1,313 @@
+:root {
+  --ink: #1c2420;
+  --ink-soft: #4b544e;
+  --paper: #eceee7;
+  --paper-raised: #f6f7f2;
+  --rule: #c9cdc2;
+  --rule-strong: #1c2420;
+  --gold: #a9752f;
+  --green: #3c6b4f;
+  --rust: #9c4a3a;
+  --focus: #2f6fed;
+
+  --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+}
+
+.app-shell {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 0 28px 80px;
+}
+
+/* ---------- Masthead / nav ---------- */
+
+.masthead {
+  padding: 44px 0 0;
+}
+
+.masthead h1 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 42px;
+  letter-spacing: 0.2px;
+  margin: 0 0 2px;
+}
+
+.masthead .sub {
+  color: var(--ink-soft);
+  font-size: 14px;
+  margin: 0 0 28px;
+}
+
+.tabs {
+  display: flex;
+  gap: 2px;
+  border-bottom: 2px solid var(--rule-strong);
+}
+
+.tabs a {
+  text-decoration: none;
+  font-size: 14px;
+  color: var(--ink-soft);
+  padding: 10px 18px 12px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  position: relative;
+  top: 2px;
+}
+
+.tabs a.active {
+  color: var(--ink);
+  background: var(--paper-raised);
+  border-color: var(--rule-strong);
+  border-radius: 4px 4px 0 0;
+  font-weight: 600;
+}
+
+main {
+  padding-top: 32px;
+}
+
+/* ---------- Cards / surfaces ---------- */
+
+.sheet {
+  background: var(--paper-raised);
+  border: 1px solid var(--rule-strong);
+  border-radius: 3px;
+}
+
+/* ---------- Form ---------- */
+
+.entry-form {
+  padding: 32px;
+  max-width: 520px;
+}
+
+.field {
+  margin-bottom: 22px;
+}
+
+.field label {
+  display: block;
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-bottom: 6px;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 15px;
+  font-family: var(--sans);
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+}
+
+.field input:focus,
+.field select:focus {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+  border-color: var(--focus);
+}
+
+.field-row {
+  display: flex;
+  gap: 16px;
+}
+
+.field-row .field {
+  flex: 1;
+}
+
+.amount-field {
+  position: relative;
+}
+
+.amount-field input {
+  padding-left: 24px;
+}
+
+.amount-field::before {
+  content: 'R';
+  position: absolute;
+  left: 12px;
+  top: 34px;
+  color: var(--ink-soft);
+  font-size: 15px;
+  pointer-events: none;
+}
+
+.submit-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 30px;
+}
+
+.btn-primary {
+  background: var(--ink);
+  color: var(--paper-raised);
+  border: none;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: #000;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.status-msg {
+  font-size: 13px;
+}
+
+.status-msg.ok { color: var(--green); }
+.status-msg.err { color: var(--rust); }
+
+/* ---------- Filters ---------- */
+
+.filters {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  padding: 20px 24px;
+  margin-bottom: 18px;
+}
+
+.filters .field {
+  margin-bottom: 0;
+}
+
+.filters .field label {
+  margin-bottom: 5px;
+}
+
+.clear-link {
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 10px 0;
+  text-decoration: underline;
+}
+
+/* ---------- Ledger table ---------- */
+
+.ledger {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.ledger thead th {
+  text-align: left;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  font-weight: 600;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--rule-strong);
+}
+
+.ledger thead th.num {
+  text-align: right;
+}
+
+.ledger tbody td {
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 14.5px;
+}
+
+.ledger tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.ledger td.num {
+  text-align: right;
+  font-family: var(--serif);
+}
+
+.ledger td.name {
+  font-weight: 500;
+}
+
+.category-pill {
+  display: inline-block;
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  border: 1px solid var(--rule);
+  padding: 2px 8px;
+  border-radius: 100px;
+}
+
+.ledger-total {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 18px 4px;
+  font-family: var(--serif);
+  font-size: 15px;
+  border-top: 2px solid var(--rule-strong);
+  margin-top: -1px;
+}
+
+.ledger-total .label {
+  font-family: var(--sans);
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.empty-state, .load-state {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+@media (max-width: 640px) {
+  .app-shell { padding: 0 16px 60px; }
+  .filters { flex-wrap: wrap; }
+  .field-row { flex-direction: column; gap: 22px; }
+  .ledger thead { display: none; }
+  .ledger, .ledger tbody, .ledger tr, .ledger td { display: block; width: 100%; }
+  .ledger tr { padding: 12px 18px; border-bottom: 1px solid var(--rule); }
+  .ledger td { border: none; padding: 3px 0; }
+  .ledger td.num { text-align: left; }
+}
