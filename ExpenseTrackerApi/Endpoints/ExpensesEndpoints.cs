@@ -27,36 +27,54 @@ public static class ExpensesEndpoints
         //     .ToListAsync()
         // );
 
+        // GET /expenses?page=1&pageSize=20&month=2026-06&categoryId=3
         group.MapGet("/", async (
             ExpenseContext dbContext,
-            int? month,
-            int? categoryId) =>
+            int page = 1,
+            int pageSize = 20,
+            string? month = null,
+            int? categoryId = null) =>
         {
-        var query = dbContext.Expenses
-            .Include(expense => expense.Category)
-            .AsQueryable();
+            page = page < 1 ? 1 : page;
+            pageSize = pageSize is < 1 or > 100 ? 20 : pageSize;
 
-        if (month.HasValue)
-        {
-            query = query.Where(expense => expense.PaymentDate.Month == month.Value);
-        }
+            var query = dbContext.Expenses
+                .Include(e => e.Category)
+                .AsNoTracking()
+                .AsQueryable();
 
-        if (categoryId.HasValue)
-        {
-        query = query.Where(expense => expense.CategoryId == categoryId.Value);
-        }
+            if (categoryId is not null)
+            {
+                query = query.Where(e => e.CategoryId == categoryId);
+            }
 
-        return await query
-            .Select(expense => new ExpenseSummaryDto(
-                expense.Id,
-                expense.Name,
-                expense.Category!.Name,
-                expense.Amount,
-                expense.PaymentDate
-            ))
-            .AsNoTracking()
-            .ToListAsync();
+            // month comes in as "YYYY-MM" from the <input type="month">
+            if (!string.IsNullOrWhiteSpace(month) &&
+                DateOnly.TryParse($"{month}-01", out var parsedMonth))
+            {
+                query = query.Where(e =>
+                    e.PaymentDate.Year == parsedMonth.Year &&
+                    e.PaymentDate.Month == parsedMonth.Month);
+            }
+
+            query = query.OrderByDescending(e => e.PaymentDate);
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(e => new ExpenseSummaryDto(
+                    e.Id,
+                    e.Name,
+                    e.Category!.Name,
+                    e.Amount,
+                    e.PaymentDate))
+                .ToListAsync();
+
+            return Results.Ok(new PagedResult<ExpenseSummaryDto>(items, totalCount, page, pageSize));
         });
+
 
         //GET /expenses/1
         group.MapGet("/{id}", async (int id, ExpenseContext dbContext) =>
@@ -129,5 +147,10 @@ public static class ExpensesEndpoints
             return Results.NoContent();
         });
 
+    }
+
+    public record PagedResult<T>(List<T> Items, int TotalCount, int Page, int PageSize)
+    {
+        public int TotalPages => (int)Math.Ceiling(TotalCount / (double)PageSize);
     }
 }

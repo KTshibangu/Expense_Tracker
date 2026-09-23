@@ -11,6 +11,7 @@ export default function App() {
         <main>
           <Routes>
             <Route path="/" element={<NewExpense />} />
+            <Route path="/edit/:id" element={<NewExpense />} />
             <Route path="/expenses" element={<Expenses />} />
           </Routes>
         </main>
