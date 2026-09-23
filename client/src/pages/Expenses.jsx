@@ -23,8 +23,6 @@ export default function Expenses() {
     getCategories().then(setCategories).catch(() => {});
   }, []);
 
-  // Reset to page 1 whenever a filter changes, so you don't land on an
-  // out-of-range page for the new filter.
   useEffect(() => {
     setPage(1);
   }, [month, categoryId]);
