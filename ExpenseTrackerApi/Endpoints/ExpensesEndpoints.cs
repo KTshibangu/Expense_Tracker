@@ -12,44 +12,33 @@ public static class ExpensesEndpoints
     public static void MapExpensesEndpoints(this WebApplication app)
     {
         var group = app.MapGroup("/expenses");
-        //GET /expenses
-        // group.MapGet("/", async (ExpenseContext dbContext) => 
-        //     await dbContext.Expenses
-        //     .Include(expense => expense.Category)
-        //     .Select(expense => new ExpenseSummaryDto(
-        //         expense.Id,
-        //         expense.Name,
-        //         expense.Category!.Name,
-        //         expense.Amount,
-        //         expense.PaymentDate
-        //     ))
-        //     .AsNoTracking()
-        //     .ToListAsync()
-        // );
-
         // GET /expenses?page=1&pageSize=20&month=2026-06&categoryId=3
         group.MapGet("/", async (
             ExpenseContext dbContext,
             int page = 1,
-            int pageSize = 20,
+            int pageSize = 10,
             string? month = null,
+            DateOnly? startDate = null,
+            DateOnly? endDate = null,
             int? categoryId = null) =>
-        {
+        {  
             page = page < 1 ? 1 : page;
-            pageSize = pageSize is < 1 or > 100 ? 20 : pageSize;
+            pageSize = pageSize is < 1 or > 100 ? 10 : pageSize;
 
-            var query = dbContext.Expenses
-                .Include(e => e.Category)
-                .AsNoTracking()
-                .AsQueryable();
+            var query = dbContext.Expenses.AsNoTracking().AsQueryable();
 
             if (categoryId is not null)
-            {
                 query = query.Where(e => e.CategoryId == categoryId);
-            }
 
-            // month comes in as "YYYY-MM" from the <input type="month">
-            if (!string.IsNullOrWhiteSpace(month) &&
+            // Explicit date range wins over "month" if both are somehow sent.
+            if (startDate is not null)
+                query = query.Where(e => e.PaymentDate >= startDate);
+
+            if (endDate is not null)
+                query = query.Where(e => e.PaymentDate <= endDate);
+
+            if (startDate is null && endDate is null &&
+                !string.IsNullOrWhiteSpace(month) &&
                 DateOnly.TryParse($"{month}-01", out var parsedMonth))
             {
                 query = query.Where(e =>
@@ -57,23 +46,20 @@ public static class ExpensesEndpoints
                     e.PaymentDate.Month == parsedMonth.Month);
             }
 
-            query = query.OrderByDescending(e => e.PaymentDate);
-
             var totalCount = await query.CountAsync();
+            var totalAmount = await query.SumAsync(e => (decimal?)e.Amount) ?? 0m;
 
             var items = await query
+                .OrderByDescending(e => e.PaymentDate)
+                .ThenByDescending(e => e.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Select(e => new ExpenseSummaryDto(
-                    e.Id,
-                    e.Name,
-                    e.Category!.Name,
-                    e.Amount,
-                    e.PaymentDate))
+                .Select(e => new ExpenseSummaryDto(e.Id, e.Name, e.Category!.Name, e.Amount, e.PaymentDate))
                 .ToListAsync();
 
-            return Results.Ok(new PagedResult<ExpenseSummaryDto>(items, totalCount, page, pageSize));
+            return Results.Ok(new PagedResult<ExpenseSummaryDto>(items, totalCount, totalAmount, page, pageSize));
         });
+
 
 
         //GET /expenses/1
@@ -149,7 +135,8 @@ public static class ExpensesEndpoints
 
     }
 
-    public record PagedResult<T>(List<T> Items, int TotalCount, int Page, int PageSize)
+    public record PagedResult<T>(
+        List<T> Items, int TotalCount, decimal TotalAmount, int Page, int PageSize)
     {
         public int TotalPages => (int)Math.Ceiling(TotalCount / (double)PageSize);
     }
