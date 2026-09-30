@@ -8,4 +8,6 @@ public class ExpenseContext(DbContextOptions<ExpenseContext> options) : DbContex
     public DbSet<Expense> Expenses => Set<Expense>();
 
     public DbSet<Category> Categories => Set<Category>();
+
+    public DbSet<User> Users => Set<User>();
 }

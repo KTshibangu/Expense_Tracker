@@ -1,16 +1,12 @@
-//GET /expenses
+
 GET http://localhost:5127/expenses
+Authorization: Bearer 
 
 ###
 
 //GET /expenses/1
-GET http://localhost:5127/expenses/3
-
-###
-
-//POST /expenses
-POST http://localhost:5127/expenses
-Content-Type: application/json
+GET http://localhost:5127/expenses/1
+Authorization: Bearer 
 
 {
     "name": "Fish Market Groceries",
@@ -21,7 +17,8 @@ Content-Type: application/json
 
 ###
 // PUT /expenses/1
-PUT http://localhost:5127/expenses/2
+PUT http://localhost:5127/expenses/1
+Authorization: Bearer 
 Content-Type: application/json
 
 {
@@ -39,3 +36,24 @@ DELETE http://localhost:5127/expenses/3
 ###
 //GET /categories
 GET http://localhost:5127/categories
+
+###
+//POST /auth/register
+POST http://localhost:5127/auth/register
+Content-Type: application/json
+
+{
+    "name": "",
+    "email": "",
+    "password": ""
+}
+
+###
+//POST /auth/login
+POST http://localhost:5127/auth/login
+Content-Type: application/json
+
+{
+    "email": "",
+    "password": ""
+}

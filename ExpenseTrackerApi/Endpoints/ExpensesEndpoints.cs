@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using ExpenseTracker.Api.Data;
 using ExpenseTracker.Api.Dtos;
 using ExpenseTracker.Api.Models;
@@ -11,21 +12,28 @@ public static class ExpensesEndpoints
 
     public static void MapExpensesEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("/expenses");
+        var group = app.MapGroup("/expenses").RequireAuthorization();
         // GET /expenses?page=1&pageSize=20&month=2026-06&categoryId=3
         group.MapGet("/", async (
             ExpenseContext dbContext,
+            ClaimsPrincipal user,
             int page = 1,
             int pageSize = 10,
             string? month = null,
             DateOnly? startDate = null,
             DateOnly? endDate = null,
             int? categoryId = null) =>
-        {  
+        {
+            var userId = int.Parse(
+                user.FindFirstValue(ClaimTypes.NameIdentifier)!
+            );
+
             page = page < 1 ? 1 : page;
             pageSize = pageSize is < 1 or > 100 ? 10 : pageSize;
 
-            var query = dbContext.Expenses.AsNoTracking().AsQueryable();
+            var query = dbContext.Expenses
+                .Where(expense => expense.UserId == userId)
+                .AsNoTracking().AsQueryable();
 
             if (categoryId is not null)
                 query = query.Where(e => e.CategoryId == categoryId);
@@ -63,9 +71,17 @@ public static class ExpensesEndpoints
 
 
         //GET /expenses/1
-        group.MapGet("/{id}", async (int id, ExpenseContext dbContext) =>
+        group.MapGet("/{id}", async (int id, ExpenseContext dbContext, ClaimsPrincipal user) =>
         {
-            var expense = await dbContext.Expenses.FindAsync(id);
+            var userId = int.Parse(
+                user.FindFirstValue(ClaimTypes.NameIdentifier)!
+            );
+
+            var expense = await dbContext.Expenses
+                .FirstOrDefaultAsync(e =>
+                    e.Id == id &&
+                    e.UserId == userId
+            );
 
             return expense is null ? Results.NotFound() : Results.Ok(
                 new ExpenseDetailsDto(
@@ -79,14 +95,22 @@ public static class ExpensesEndpoints
         }).WithName(GetEndpointName);
 
         //POST /expenses
-        group.MapPost("/", async (CreateExpenseDto newExpense, ExpenseContext dbContext) =>
+        group.MapPost("/", async (
+            CreateExpenseDto newExpense,
+            ExpenseContext dbContext,
+            ClaimsPrincipal user) =>
         {
+            var userId = int.Parse(
+                user.FindFirstValue(ClaimTypes.NameIdentifier)!
+            );
+
             Expense expense = new()
             {
                 Name = newExpense.Name,
                 CategoryId = newExpense.CategoryId,
                 Amount = newExpense.Amount,
-                PaymentDate = newExpense.PaymentDate
+                PaymentDate = newExpense.PaymentDate,
+                UserId = userId
             };
 
             dbContext.Expenses.Add(expense);
@@ -104,9 +128,21 @@ public static class ExpensesEndpoints
         });
 
         // PUT /expenses/1
-        group.MapPut("/{id}", async (int id, UpdateExpenseDto updatedExpense, ExpenseContext dbContext) =>
+        group.MapPut("/{id}", async (
+            int id,
+            UpdateExpenseDto updatedExpense,
+            ExpenseContext dbContext,
+            ClaimsPrincipal user) =>
         {
-            var existingExpense = await dbContext.Expenses.FindAsync(id);
+            var userId = int.Parse(
+                user.FindFirstValue(ClaimTypes.NameIdentifier)!
+            );
+
+            var existingExpense = await dbContext.Expenses
+                .FirstOrDefaultAsync(e =>
+                    e.Id == id &&
+                    e.UserId == userId
+                );
 
             if (existingExpense is null)
             {
@@ -124,10 +160,17 @@ public static class ExpensesEndpoints
         });
 
         //DELETE /expenses/1
-        group.MapDelete("/{id}", async (int id, ExpenseContext dbContext) =>
+        group.MapDelete("/{id}", async (
+            int id,
+            ExpenseContext dbContext,
+            ClaimsPrincipal user) =>
         {
+            var userId = int.Parse(
+                user.FindFirstValue(ClaimTypes.NameIdentifier)!
+            );
+
             await dbContext.Expenses
-            .Where(expense => expense.Id == id)
+            .Where(expense => expense.Id == id && expense.UserId == userId)
             .ExecuteDeleteAsync();
 
             return Results.NoContent();

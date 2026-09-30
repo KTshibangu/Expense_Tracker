@@ -30,7 +30,7 @@ public static class DataExtensions
                         new Category { Name = "Transport" },
                         new Category { Name = "Healthcare" },
                         new Category { Name = "Personal & Cloning" },
-                        new Category { Name = "Famili & Children" },
+                        new Category { Name = "Family & Children" },
                         new Category { Name = "Entertainment" },
                         new Category { Name = "Subscriptions" },
                         new Category { Name = "Other" }
