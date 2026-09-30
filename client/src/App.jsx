@@ -1,21 +1,28 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Nav from './components/Nav';
+import { AuthProvider } from './auth/AuthContext';
+import ProtectedLayout from './components/ProtectedLayout';
+import Login from './pages/Login';
+import Register from './pages/Register';
 import NewExpense from './pages/NewExpense';
 import Expenses from './pages/Expenses';
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <div className="app-shell">
-        <Nav />
-        <main>
+    <AuthProvider>
+      <BrowserRouter>
+        <div className="app-shell">
           <Routes>
-            <Route path="/" element={<NewExpense />} />
-            <Route path="/edit/:id" element={<NewExpense />} />
-            <Route path="/expenses" element={<Expenses />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+
+            <Route element={<ProtectedLayout />}>
+              <Route path="/" element={<NewExpense />} />
+              <Route path="/edit/:id" element={<NewExpense />} />
+              <Route path="/expenses" element={<Expenses />} />
+            </Route>
           </Routes>
-        </main>
-      </div>
-    </BrowserRouter>
+        </div>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }

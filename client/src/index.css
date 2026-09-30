@@ -50,6 +50,13 @@ button {
   padding: 44px 0 0;
 }
 
+.masthead-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
 .masthead h1 {
   font-family: var(--serif);
   font-weight: 500;
@@ -62,6 +69,18 @@ button {
   color: var(--ink-soft);
   font-size: 14px;
   margin: 0 0 28px;
+}
+
+.account-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-top: 10px;
+}
+
+.account-email {
+  font-size: 13px;
+  color: var(--ink-soft);
 }
 
 .tabs {
@@ -117,6 +136,14 @@ main {
   font-size: 13px;
   color: var(--ink-soft);
   margin-bottom: 6px;
+}
+
+.field-hint {
+  display: block;
+  text-align: right;
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  margin-top: 4px;
 }
 
 .field input,
@@ -198,6 +225,39 @@ main {
 
 .status-msg.ok { color: var(--green); }
 .status-msg.err { color: var(--rust); }
+
+.auth-page {
+  display: flex;
+  justify-content: center;
+  padding-top: 90px;
+}
+
+.auth-form {
+  width: 100%;
+  max-width: 380px;
+}
+
+.auth-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 26px;
+  margin: 0 0 22px;
+}
+
+.auth-banner {
+  margin: -8px 0 20px;
+}
+
+.auth-switch {
+  margin: 22px 0 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.auth-switch a {
+  color: var(--ink);
+  font-weight: 600;
+}
 
 .form-mode {
   font-size: 12px;

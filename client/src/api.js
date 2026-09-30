@@ -1,4 +1,17 @@
 const BASE = '/api';
+const TOKEN_KEY = 'expenseTracker.token';
+
+export function getToken() {
+  return localStorage.getItem(TOKEN_KEY);
+}
+
+export function setToken(token) {
+  if (token) {
+    localStorage.setItem(TOKEN_KEY, token);
+  } else {
+    localStorage.removeItem(TOKEN_KEY);
+  }
+}
 
 async function handle(res) {
   if (!res.ok) {
@@ -10,42 +23,91 @@ async function handle(res) {
   return text ? JSON.parse(text) : null;
 }
 
-export async function getCategories() {
-  const res = await fetch(`${BASE}/categories`);
+// Fetch wrapper that attaches the JWT and clears it on a 401, so an expired
+// or invalid token sends the user back to /login rather than showing a
+// confusing "request failed" error.
+async function authFetch(path, options = {}) {
+  const token = getToken();
+  const headers = { ...(options.headers || {}) };
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  const res = await fetch(`${BASE}${path}`, { ...options, headers });
+
+  if (res.status === 401) {
+    setToken(null);
+    if (!window.location.pathname.startsWith('/login')) {
+      window.location.href = '/login';
+    }
+    throw new Error('Your session expired. Please log in again.');
+  }
+
   return handle(res);
 }
 
-export async function getExpenses({ page = 1, pageSize = 20, month, categoryId } = {}) {
+// ---------- Auth (no token required) ----------
+
+export async function register({ name, email, password }) {
+  const res = await fetch(`${BASE}/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email, password }),
+  });
+  return handle(res);
+}
+
+export async function login({ email, password }) {
+  const res = await fetch(`${BASE}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  const data = await handle(res);
+  if (!data?.token) {
+    throw new Error("Login succeeded but no token was returned — check the response shape.");
+  }
+  setToken(data.token);
+  return data;
+}
+
+// ---------- Categories ----------
+
+export async function getCategories() {
+  return authFetch('/categories');
+}
+
+// ---------- Expenses ----------
+
+export async function getExpense(id) {
+  return authFetch(`/expenses/${id}`);
+}
+
+export async function getExpenses({ page = 1, pageSize = 20, month, startDate, endDate, categoryId } = {}) {
   const params = new URLSearchParams();
   params.set('page', page);
   params.set('pageSize', pageSize);
-  if (month) params.set('month', month);
+  if (startDate) params.set('startDate', startDate);
+  if (endDate) params.set('endDate', endDate);
+  if (!startDate && !endDate && month) params.set('month', month);
   if (categoryId) params.set('categoryId', categoryId);
-  const res = await fetch(`${BASE}/expenses?${params.toString()}`);
-  return handle(res);
+  return authFetch(`/expenses?${params.toString()}`);
 }
 
 export async function createExpense(expense) {
-  const res = await fetch(`${BASE}/expenses`, {
+  return authFetch('/expenses', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(expense),
   });
-  return handle(res);
 }
 
 export async function updateExpense(id, expense) {
-  const res = await fetch(`${BASE}/expenses/${id}`, {
+  return authFetch(`/expenses/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ id: Number(id), ...expense }),
   });
-  return handle(res);
 }
 
 export async function deleteExpense(id) {
-  const res = await fetch(`${BASE}/expenses/${id}`, {
-    method: 'DELETE',
-  });
-  return handle(res);
+  return authFetch(`/expenses/${id}`, { method: 'DELETE' });
 }

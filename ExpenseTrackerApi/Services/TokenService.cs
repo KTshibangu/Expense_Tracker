@@ -13,7 +13,8 @@ public class TokenService(IConfiguration configuration)
         var claims = new[]
         {
           new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-          new Claim(JwtRegisteredClaimNames.Email, user.Email)
+          new Claim(JwtRegisteredClaimNames.Email, user.Email),
+          new Claim(JwtRegisteredClaimNames.Name, user.Name)
         };
 
         var key = configuration["Jwt:Key"]
