@@ -79,8 +79,9 @@ button {
 }
 
 .account-email {
-  font-size: 13px;
+  font-size: 15px;
   color: var(--ink-soft);
+  font-weight: bold;
 }
 
 .tabs {
@@ -270,13 +271,12 @@ main {
 /* ---------- Shared bits ---------- */
 
 .clear-link {
-  background: none;
-  border: none;
-  color: var(--ink-soft);
-  font-size: 13px;
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper-raised);
+  font-weight: 600;
+  font-size: 16px;
   cursor: pointer;
-  padding: 10px 0;
-  text-decoration: underline;
 }
 
 .category-pill {
