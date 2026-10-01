@@ -41,13 +41,15 @@ builder.Services.AddCors(options =>
     options.AddPolicy("ReactApp", policy =>
     {
         policy
+            .WithOrigins("https://expense-tracker-zeta-two-37.vercel.app")
             .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowAnyOrigin();
+            .AllowAnyMethod();
     });
 });
 
 builder.Services.AddAuthorization();
+
+builder.WebHost.UseUrls("http://0.0.0.0:8080");
 
 var app = builder.Build();
 
@@ -63,5 +65,10 @@ app.MapCategoriesEndpoints();
 
 
 app.MigrateDb();
+
+app.MapGet("/", () => Results.Ok(new
+{
+    message = "Expense Tracker API is running"
+}));
 
 app.Run();

@@ -1,6 +1,6 @@
 
-GET http://localhost:5127/expenses
-Authorization: Bearer 
+GET http://localhost:8080/expenses
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjEiLCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJuYW1lIjoiVGVzdCIsImV4cCI6MTc5MDg2NzczNiwiaXNzIjoiRXhwZW5zZVRyYWNrZXJBcGkiLCJhdWQiOiJFeHBlbnNlVHJhY2tlckNsaWVudCJ9.cKKLltOl-8MBQksgbvRqf6kRHhvhNZgtwFAuhnrwc9Q
 
 ###
 
@@ -50,10 +50,10 @@ Content-Type: application/json
 
 ###
 //POST /auth/login
-POST http://localhost:5127/auth/login
+POST http://localhost:8080/auth/login
 Content-Type: application/json
 
 {
-    "email": "",
-    "password": ""
+    "email": "test@test.com",
+    "password": "12345678"
 }
