@@ -36,9 +36,22 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("ReactApp", policy =>
+    {
+        policy
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowAnyOrigin();
+    });
+});
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
+app.UseCors("ReactApp");
 
 app.UseAuthentication();
 app.UseAuthorization();
