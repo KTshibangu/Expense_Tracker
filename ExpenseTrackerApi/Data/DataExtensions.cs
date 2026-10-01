@@ -15,9 +15,9 @@ public static class DataExtensions
 
     public static void AddExpenseTrackerDb(this WebApplicationBuilder builder)
     {
-        var connStriing = builder.Configuration.GetConnectionString("ExpenseTracker");
-        builder.Services.AddSqlite<ExpenseContext>(
-            connStriing,
+        var connectionString = builder.Configuration.GetConnectionString("ExpenseTracker");
+        builder.Services.AddNpgsql<ExpenseContext>(
+            connectionString,
             optionsAction: options => options.UseSeeding((context, _) =>
             {
                 if (!context.Set<Category>().Any())
