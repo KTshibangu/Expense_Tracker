@@ -14,6 +14,15 @@ export function setToken(token) {
 }
 
 async function handle(res) {
+  if (res.status === 429) {
+    const retryAfter = res.headers.get('Retry-After');
+    throw new Error(
+      retryAfter
+        ? `Too many requests. Try again in ${retryAfter} seconds.`
+        : 'Too many requests. Please try again shortly.'
+    );
+  }
+
   if (!res.ok) {
     const text = await res.text().catch(() => '');
     throw new Error(text || `Request failed with status ${res.status}`);

@@ -12,7 +12,7 @@ public static class ExpensesEndpoints
 
     public static void MapExpensesEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("/expenses").RequireAuthorization();
+        var group = app.MapGroup("/expenses").RequireAuthorization().RequireRateLimiting("api");
         // GET /expenses?page=1&pageSize=20&month=2026-06&categoryId=3
         group.MapGet("/", async (
             ExpenseContext dbContext,
